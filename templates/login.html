@@ -1,0 +1,41 @@
+ {% extends "layout.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="form-container">
+  <h3>Login</h3>
+
+  <!-- ★ Added User/Admin Text with CSS ★ -->
+  <p class="login-type">User Login & Admin Login</p>
+
+  <form action="{{ url_for('login_post') }}" method="POST">
+
+    <label for="emailLogin">Email</label>
+    <input type="email" id="emailLogin" name="email" required />
+
+    <label for="passwordLogin">Password</label>
+    <input type="password" id="passwordLogin" name="password" required />
+
+    <button type="submit" class="btn">Login</button>
+  </form>
+
+  <div class="links">
+    <a href="{{ url_for('forgot_password') }}">Forgot Password?</a>
+    <a href="{{ url_for('register') }}">Register</a>
+  </div>
+</div>
+
+<!-- ★ Added CSS -->
+<style>
+  .login-type {
+      text-align: center;
+      margin-top: -5px;
+      margin-bottom: 15px;
+      font-size: 15px;
+      color: #0088ff;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+  }
+</style>
+
+{% endblock %}

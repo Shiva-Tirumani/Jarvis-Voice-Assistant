@@ -1,0 +1,375 @@
+ {# templates/jarvis.html - Red / Black "Ultron Mode" #}
+{% extends "layout.html" %}
+{% block title %}Jarvis — Ultron Mode{% endblock %}
+
+{% block content %}
+<style>
+  /* ===== Ultron Red / Black Theme ===== */
+  :root{
+    --bg-1:#0a0a0a;
+    --bg-2:#120707;
+    --panel:#0f0708;
+    --accent:#ff0037;
+    --accent-2:#ff6a6a;
+    --glass: rgba(255,10,30,0.06);
+    --muted:#bdbdbd;
+  }
+
+  /* ==== FULLSCREEN VIDEO BACKGROUND ==== */
+  #bgVideo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -10;
+    opacity: 0.32;
+    filter: blur(2px) saturate(1.3) brightness(0.7);
+    pointer-events: none;
+  }
+
+  body { 
+    background: linear-gradient(180deg,var(--bg-1), #060405 60%); 
+    color:var(--muted);
+    font-family: "Inter", "Segoe UI", Arial, sans-serif; 
+    -webkit-font-smoothing:antialiased; 
+  }
+
+  .container {
+    max-width: 980px; margin: 36px auto; padding: 22px;
+    position: relative; /* video behind container */
+  }
+
+  .top-bar {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .back-btn {
+    background:transparent; 
+    border:1px solid rgba(255,255,255,0.04); 
+    color:var(--accent-2); 
+    padding:6px 10px; 
+    border-radius:8px;
+    font-weight:700; 
+    cursor:pointer; 
+    text-decoration:none; 
+    box-shadow:0 6px 24px rgba(255,0,55,0.06);
+  }
+  .token-pill { 
+    font-size:13px; 
+    color:#fff; 
+    background: linear-gradient(90deg, rgba(255,0,55,0.14), rgba(255,106,106,0.06)); 
+    padding:6px 10px; 
+    border-radius:999px; 
+    border:1px solid rgba(255,0,55,0.08); 
+  }
+
+  .card {
+    margin-top:16px; border-radius:16px; padding:28px; 
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.15));
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02); 
+    border:1px solid rgba(255,255,255,0.03);
+  }
+
+  .holo {
+    width:170px; height:170px; border-radius:50%; margin:6px auto; position:relative; perspective:900px;
+  }
+  .holo-core {
+    width:100%; height:100%; border-radius:50%; 
+    background: radial-gradient(circle at 35% 25%, rgba(255,50,60,0.14) 0%, rgba(0,0,0,0.25) 55%);
+    border: 2px solid rgba(255,0,55,0.18); 
+    position:relative; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    overflow:hidden;
+    box-shadow: 0 0 70px rgba(255,0,55,0.12), 0 0 18px rgba(0,0,0,0.6) inset;
+    transform-style:preserve-3d;
+    animation: coreTilt 6s ease-in-out infinite;
+  }
+  @keyframes coreTilt {
+    0% { transform: rotateX(0deg) rotateY(0deg) }
+    50% { transform: rotateX(8deg) rotateY(-10deg) }
+    100% { transform: rotateX(0deg) rotateY(0deg) }
+  }
+
+  .core-glow {
+    position:absolute; inset:0; filter:blur(20px); opacity:.6; pointer-events:none;
+    background: conic-gradient(from 120deg, rgba(255,0,55,0.16), rgba(255,106,106,0.06), rgba(255,0,55,0.10));
+    mix-blend-mode: screen;
+  }
+
+  .eq {
+    display:flex; gap:6px; align-items:end; height:56px; margin-top:8px;
+  }
+  .bar { 
+    width:8px; 
+    background:linear-gradient(180deg,var(--accent), var(--accent-2)); 
+    border-radius:4px; 
+    transform-origin:bottom; 
+    transition:height .12s linear; 
+    box-shadow: 0 6px 18px rgba(255,0,55,0.12); 
+  }
+
+  .title { 
+    font-size:22px; color:#fff; font-weight:700; 
+    text-align:center; margin-top:12px; 
+    text-shadow:0 0 12px rgba(255,0,55,0.08); 
+  }
+
+  .controls { 
+    display:flex; gap:12px; 
+    justify-content:center; 
+    margin-top:18px; 
+    flex-wrap:wrap; 
+  }
+  .btn {
+    background: linear-gradient(180deg, rgba(255,0,55,0.12), rgba(255,0,55,0.06));
+    border: 1px solid rgba(255,0,55,0.14); 
+    color:#fff; 
+    padding:10px 16px; 
+    border-radius:12px; 
+    cursor:pointer; 
+    font-weight:700;
+    backdrop-filter: blur(6px);
+  }
+  .btn.alt { 
+    background:transparent; 
+    color:var(--accent-2); 
+    border:1px solid rgba(255,255,255,0.04); 
+  }
+
+  #log {
+    margin-top:18px; padding:12px; 
+    border-radius:10px; height:160px; overflow:auto; 
+    background: linear-gradient(180deg, rgba(10,6,6,0.4), rgba(12,6,6,0.6)); 
+    border:1px solid rgba(255,0,55,0.04);
+    color:#ffdfe2; font-size:13px;
+  }
+  #status { margin-top:8px; text-align:center; color:#ffb3bd; font-weight:700; }
+
+  .meta { margin-top:12px; text-align:center; color:#bdbdbd; font-size:12px; }
+
+  @media (max-width:640px) {
+    .holo { width:120px; height:120px; }
+    .card { padding:18px; }
+  }
+</style>
+
+<!-- ****** FULLSCREEN VIDEO BACKGROUND ****** -->
+<video id="bgVideo" autoplay muted loop playsinline>
+  <source src="{{ url_for('static', filename='videos/jarvis_bg.mp4') }}" type="video/mp4">
+</video>
+
+<div class="container">
+
+  <div class="top-bar">
+    <a class="back-btn" href="{{ url_for('user_dashboard') }}">⬅ Back</a>
+  </div>
+
+  <div class="card">
+    <div class="holo" aria-hidden="true">
+      <div class="holo-core">
+        <div class="core-glow"></div>
+        <svg width="140" height="140" viewBox="0 0 140 140" style="transform:translateZ(40px) rotateX(12deg)">
+          <circle cx="70" cy="70" r="38" stroke="rgba(255,20,40,0.12)" stroke-width="2" fill="none"/>
+          <circle cx="70" cy="70" r="50" stroke="rgba(255,20,40,0.06)" stroke-width="1.4" fill="none"/>
+          <circle cx="70" cy="70" r="22" stroke="rgba(255,80,100,0.09)" stroke-width="1.6" fill="#0b0203"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="title">JARVIS — Ultron Mode</div>
+
+    <div class="eq" id="eq">
+      <div class="bar" style="height:14px"></div>
+      <div class="bar" style="height:22px"></div>
+      <div class="bar" style="height:10px"></div>
+      <div class="bar" style="height:28px"></div>
+      <div class="bar" style="height:18px"></div>
+      <div class="bar" style="height:12px"></div>
+      <div class="bar" style="height:20px"></div>
+    </div>
+
+    <div class="controls">
+      <button id="speakBtn" class="btn">🎙 Start Listening</button>
+      <button id="stopBtn" class="btn alt">■ Stop</button>
+      <button id="muteBtn" class="btn alt">Mute TTS</button>
+
+      <label style="align-self:center; color:#ffb3bd; font-weight:700;">
+        <input id="continuous" type="checkbox" style="margin-right:8px;"> Continuous
+      </label>
+    </div>
+
+    <p id="status">Idle</p>
+    <div id="log" aria-live="polite"></div>
+
+    <div class="meta">Try commands like <em>"open youtube"</em>, <em>"play X on youtube"</em>, <em>"volume up by 10"</em>, <em>"set brightness to 40"</em>.</div>
+
+  </div>
+</div>
+
+
+<script>
+/* ===== CLIENT-SIDE LOGIC ===== */
+const COMMAND_TOKEN = "local-only-token";
+
+const speakBtn = document.getElementById('speakBtn');
+const stopBtn = document.getElementById('stopBtn');
+const muteBtn = document.getElementById('muteBtn');
+const statusEl = document.getElementById('status');
+const logEl = document.getElementById('log');
+const continuousChk = document.getElementById('continuous');
+const eqBars = Array.from(document.querySelectorAll('#eq .bar'));
+
+let synthMuted = false;
+let recognition = null;
+let listening = false;
+let silenceTimer = null;
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SpeechRecognition) {
+  statusEl.textContent = "SpeechRecognition not supported — use Chrome/Edge.";
+} else {
+  recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
+  recognition.continuous = true;
+
+  recognition.onstart = () => {
+    listening = true;
+    statusEl.textContent = "Listening...";
+    speakBtn.textContent = "🔴 Listening...";
+    animateEQ(true);
+  };
+
+  recognition.onresult = (evt) => {
+    let interim = "";
+    let final = "";
+    for (let i = evt.resultIndex; i < evt.results.length; i++) {
+      const r = evt.results[i];
+      if (r.isFinal) final += r[0].transcript;
+      else interim += r[0].transcript;
+    }
+
+    statusEl.textContent = interim || final || "Listening...";
+    const proxy = Math.min(1, (interim.length + final.length) / 60);
+    rippleEQ(proxy);
+    resetSilenceTimer();
+
+    if (final.trim().length > 0) {
+      addLog("You: " + final.trim());
+      processCommand(final.trim());
+    }
+  };
+
+  recognition.onerror = (e) => {
+    statusEl.textContent = "Error: " + e.error;
+    animateEQ(false);
+  };
+
+  recognition.onend = () => {
+    listening = false;
+    animateEQ(false);
+    speakBtn.textContent = "🎙 Start Listening";
+    statusEl.textContent = "Idle";
+
+    if (continuousChk.checked && !stopRequested) {
+      try { recognition.start(); } catch {}
+    }
+  };
+}
+
+let stopRequested = false;
+function resetSilenceTimer() {
+  clearTimeout(silenceTimer);
+  silenceTimer = setTimeout(() => {
+    try { recognition.stop(); } catch {}
+  }, 1600);
+}
+
+function addLog(text) {
+  const d = document.createElement('div');
+  d.textContent = `${text} — ${new Date().toLocaleTimeString()}`;
+  logEl.prepend(d);
+}
+
+function speakText(text) {
+  if (synthMuted) return;
+  if (!("speechSynthesis" in window)) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 1.0;
+  u.pitch = 1.0;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+let eqInterval = null;
+function animateEQ(on) {
+  if (!on) {
+    eqBars.forEach((b,i) => b.style.height = `${8 + (i%3)*6}px`);
+    return;
+  }
+  clearInterval(eqInterval);
+  eqInterval = setInterval(()=> {
+    eqBars.forEach(b => {
+      b.style.height = (8 + Math.random()*42) + "px";
+    });
+  }, 110);
+}
+
+function rippleEQ(level) {
+  eqBars.forEach((b, i) => {
+    const base = 8 + (i%3)*6;
+    const extra = Math.round(level * (30 + (i*6)));
+    b.style.height = (base + extra) + "px";
+  });
+}
+
+speakBtn.addEventListener('click', () => {
+  stopRequested = false;
+  try { recognition.start(); } catch {}
+});
+
+stopBtn.addEventListener('click', () => {
+  stopRequested = true;
+  try { recognition.stop(); } catch {}
+  statusEl.textContent = "Stopped by user";
+  animateEQ(false);
+});
+
+muteBtn.addEventListener('click', () => {
+  synthMuted = !synthMuted;
+  muteBtn.textContent = synthMuted ? "Unmute TTS" : "Mute TTS";
+});
+
+async function processCommand(cmd) {
+  statusEl.textContent = "Processing command...";
+  try {
+    const res = await fetch("/voice-command", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ command: cmd, token: COMMAND_TOKEN })
+    });
+
+    if (res.status === 401) {
+      addLog("Jarvis: Unauthorized");
+      speakText("Unauthorized access.");
+      return;
+    }
+
+    const data = await res.json();
+    addLog("Jarvis: " + data.reply);
+    speakText(data.reply || "Done.");
+
+    if (data.action === "open" && data.value) window.open(data.value, "_blank");
+    statusEl.textContent = "Idle";
+  } catch (err) {
+    addLog("Error contacting server: " + err.message);
+    statusEl.textContent = "Error";
+  }
+}
+</script>
+
+{% endblock %}

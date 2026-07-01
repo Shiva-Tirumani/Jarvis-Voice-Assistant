@@ -1,0 +1,204 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- ⭐ ALL CSS GOES HERE -->
+<style>
+
+    body {
+        background: #eaecf1;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .dashboard-container {
+        max-width: 900px;
+        margin: 40px auto;
+        background: #81c6e7;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0px 5px 20px rgba(0,0,0,0.1);
+        animation: fadeIn 0.6s ease-in-out;
+        position: relative;
+    }
+
+    .dashboard-buttons {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 28px;
+        margin: 10px;
+        font-size: 17px;
+        font-weight: 600;
+        border-radius: 50px;
+        text-decoration: none;
+        color: #e8faff;
+        background: linear-gradient(145deg, #0d0d0d, #1a1a1a);
+        box-shadow: 0px 6px 15px rgba(0, 255, 255, 0.25);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #00e5ff;
+    }
+
+    .btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 0px 10px 25px rgba(0, 255, 255, 0.35);
+        border-color: #00ffff;
+    }
+
+    /* ⭐ ACTIVATE JARVIS BUTTON */
+    .activate-btn {
+        background: #ff0033;
+        color: white;
+        padding: 14px 30px;
+        border: none;
+        border-radius: 50px;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .3s;
+        box-shadow: 0 0 12px rgba(255, 0, 51, 0.5);
+    }
+
+    .activate-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 20px rgba(255, 0, 51, 0.8);
+    }
+
+    /* ⭐ JARVIS ANIMATION */
+    .jarvis-box {
+        margin-top: 35px;
+        padding: 25px;
+        background: #0b0f1a;
+        color: #e0f7ff;
+        border-radius: 12px;
+        text-align: center;
+        border: 2px solid #00eaff;
+        box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+        animation: fadeInBox 0.6s ease-out;
+    }
+
+    .circle {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        margin: auto;
+        border: 4px solid #00eaff;
+        animation: spin 2s linear infinite;
+        margin-bottom: 15px;
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+    }
+
+    .pulse {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        margin: -155px auto 30px auto;
+        background: rgba(0, 255, 255, 0.2);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 0.7; }
+        100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    @keyframes fadeInBox {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+</style>
+
+<!-- ⭐ HTML CONTENT STARTS HERE -->
+<div class="dashboard-container">
+
+    <div class="dashboard-buttons">
+        <a href="/" class="btn">🏠 Home</a>
+        <a href="/help" class="btn">❓ Help</a>
+        <a href="javascript:history.back()" class="btn">⬅ Back</a>
+    </div>
+
+    <h1>User Dashboard</h1>
+    <p>Welcome! You are logged in successfully.</p>
+
+    <div class="desc-box">
+        <h2>About Jarvis</h2>
+        <p>
+            Jarvis is a powerful and intelligent assistant designed to make your work faster,
+            smoother, and more organized. With smart navigation, clean UI, and automation support,
+            Jarvis helps enhance productivity and provides seamless user interaction.
+        </p>
+    </div>
+<div class="activate-wrapper">
+    <a href="/jarvis" class="activate-btn">⚡ Activate Jarvis</a>
+</div>
+
+<style>
+    .activate-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 35px;
+    }
+
+    .activate-btn {
+        padding: 14px 32px;
+        background: linear-gradient(145deg, #ff1a1a, #b30000);
+        color: white;
+        font-weight: 700;
+        font-size: 18px;
+        border-radius: 50px;
+        border: 2px solid #ff4d4d;
+        text-decoration: none;
+        box-shadow: 0 6px 15px rgba(255, 0, 0, 0.35);
+        transition: 0.3s ease;
+        letter-spacing: 1px;
+    }
+
+    .activate-btn:hover {
+        transform: scale(1.08);
+        box-shadow: 0 0 25px rgba(255, 75, 75, 0.7);
+        background: linear-gradient(145deg, #ff3333, #cc0000);
+    }
+
+    .activate-btn:active {
+        transform: scale(0.95);
+    }
+</style>
+
+
+
+    <!-- ⭐ JARVIS ANIMATION -->
+    <div id="jarvis-animation" class="jarvis-box" style="display:none;">
+        <div class="circle"></div>
+        <div class="pulse"></div>
+        <h2>Jarvis Activated...</h2>
+        <p>Initializing systems, loading modules, preparing interface...</p>
+    </div>
+
+</div>
+
+<!-- ⭐ JAVASCRIPT -->
+<script>
+function activateJarvis() {
+    document.getElementById("jarvis-animation").style.display = "block";
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+</script>
+
+{% endblock %}
