@@ -1,5 +1,5 @@
 Flask
-PyMySQL
+gunicorn
 wikipedia
 requests
 pyautogui
